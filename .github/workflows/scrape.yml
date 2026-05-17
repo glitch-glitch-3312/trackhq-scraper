@@ -1,0 +1,26 @@
+name: Scrape Athletic.net
+on:
+  workflow_dispatch:
+    inputs:
+      athleticNetId:
+        required: true
+      userId:
+        required: true
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install playwright playwright-extra puppeteer-extra-plugin-stealth @supabase/supabase-js
+      - run: npx playwright install chromium --with-deps
+      - name: Scrape
+        env:
+          ATHLETIC_NET_ID: ${{ inputs.athleticNetId }}
+          USER_ID: ${{ inputs.userId }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: node scrape.js
